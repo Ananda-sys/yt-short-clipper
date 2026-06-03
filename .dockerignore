@@ -1,0 +1,13 @@
+.venv/
+.git/
+.gitignore
+__pycache__/
+*.pyc
+core/__pycache__/
+utils/__pycache__/
+pages/__pycache__/
+components/__pycache__/
+config/__pycache__/
+dialogs/__pycache__/
+.idea/
+.vscode/
