@@ -46,10 +46,10 @@ class ClippingPage(ctk.CTkFrame):
         main.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Progress section
-        progress_frame = ctk.CTkFrame(main, fg_color=("gray90", "gray17"))
+        progress_frame = ctk.CTkFrame(main, fg_color=("gray90", "gray17"), corner_radius=10)
         progress_frame.pack(fill="x", padx=15, pady=15)
         
-        ctk.CTkLabel(progress_frame, text="Clipping Progress", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=15, pady=(12, 8))
+        ctk.CTkLabel(progress_frame, text="✂️ Clipping Progress", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w", padx=15, pady=(12, 8))
         
         # Progress info
         info_frame = ctk.CTkFrame(progress_frame, fg_color="transparent")
@@ -58,11 +58,11 @@ class ClippingPage(ctk.CTkFrame):
         # Current clip info
         self.current_clip_label = ctk.CTkLabel(info_frame, text="Preparing...", 
             font=ctk.CTkFont(size=14, weight="bold"))
-        self.current_clip_label.pack(anchor="w", pady=(0, 5))
+        self.current_clip_label.pack(anchor="w", pady=(0, 8))
         
         # Progress bar
-        self.progress_bar = ctk.CTkProgressBar(info_frame, height=20)
-        self.progress_bar.pack(fill="x", pady=(0, 5))
+        self.progress_bar = ctk.CTkProgressBar(info_frame, height=12, corner_radius=6)
+        self.progress_bar.pack(fill="x", pady=(0, 8))
         self.progress_bar.set(0)
         
         # Progress text (X of Y clips)
@@ -71,35 +71,37 @@ class ClippingPage(ctk.CTkFrame):
         self.progress_text.pack(anchor="w")
         
         # Current status
-        self.status_frame = ctk.CTkFrame(main)
+        self.status_frame = ctk.CTkFrame(main, fg_color=("gray85", "gray12"), corner_radius=10)
         self.status_frame.pack(fill="x", padx=15, pady=(0, 15))
         
-        self.status_label = ctk.CTkLabel(self.status_frame, text="Initializing...", 
-            font=ctk.CTkFont(size=12), wraplength=480)
-        self.status_label.pack(pady=12)
+        self.status_label = ctk.CTkLabel(self.status_frame, text="⏳ Initializing...", 
+            font=ctk.CTkFont(size=13), wraplength=480)
+        self.status_label.pack(pady=12, padx=12)
         
         # Buttons
         btn_frame = ctk.CTkFrame(main, fg_color="transparent")
         btn_frame.pack(fill="x", padx=15, pady=(0, 15))
         
         row1 = ctk.CTkFrame(btn_frame, fg_color="transparent")
-        row1.pack(fill="x", pady=(0, 5))
+        row1.pack(fill="x", pady=(0, 8))
         
         self.cancel_btn = ctk.CTkButton(row1, text="❌ Cancel", height=45, fg_color="#c0392b", 
-            hover_color="#e74c3c", command=self.on_cancel)
+            hover_color="#e74c3c", font=ctk.CTkFont(size=13, weight="bold"), command=self.on_cancel)
         self.cancel_btn.pack(side="left", fill="x", expand=True, padx=(0, 5))
         
-        self.back_btn = ctk.CTkButton(row1, text="← Back", height=45, state="disabled", command=self.on_back)
+        self.back_btn = ctk.CTkButton(row1, text="← Back", height=45, state="disabled", 
+            fg_color=("gray70", "gray25"), hover_color=("gray60", "gray30"), command=self.on_back)
         self.back_btn.pack(side="left", fill="x", expand=True, padx=(5, 0))
         
         row2 = ctk.CTkFrame(btn_frame, fg_color="transparent")
         row2.pack(fill="x")
         
-        self.open_btn = ctk.CTkButton(row2, text="📂 Open Output", height=45, state="disabled", command=self.on_open_output)
+        self.open_btn = ctk.CTkButton(row2, text="📂 Open Output Folder", height=45, state="disabled", 
+            fg_color=("gray70", "gray25"), hover_color=("gray60", "gray30"), command=self.on_open_output)
         self.open_btn.pack(side="left", fill="x", expand=True, padx=(0, 5))
         
-        self.results_btn = ctk.CTkButton(row2, text="📂 Browse Sessions", height=45, state="disabled", 
-            fg_color="#27ae60", hover_color="#2ecc71", command=self.on_browse)
+        self.results_btn = ctk.CTkButton(row2, text="📋 Browse Sessions", height=45, state="disabled", 
+            fg_color="#27ae60", hover_color="#2ecc71", font=ctk.CTkFont(size=13, weight="bold"), command=self.on_browse)
         self.results_btn.pack(side="left", fill="x", expand=True, padx=(5, 0))
         
         # Footer

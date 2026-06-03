@@ -69,35 +69,39 @@ class ProcessingPage(ctk.CTkFrame):
             self.steps.append(step)
         
         # Current status
-        self.status_frame = ctk.CTkFrame(main)
+        self.status_frame = ctk.CTkFrame(main, fg_color=("gray85", "gray12"), corner_radius=10)
         self.status_frame.pack(fill="x", padx=15, pady=(0, 15))
         
-        self.status_label = ctk.CTkLabel(self.status_frame, text="Initializing...", 
-            font=ctk.CTkFont(size=13), wraplength=480)
-        self.status_label.pack(pady=12)
+        self.status_label = ctk.CTkLabel(self.status_frame, text="⏳ Initializing...", 
+            font=ctk.CTkFont(size=14), wraplength=480)
+        self.status_label.pack(pady=15, padx=15)
         
         # Buttons
         btn_frame = ctk.CTkFrame(main, fg_color="transparent")
         btn_frame.pack(fill="x", padx=15, pady=(0, 15))
         
+        # Row 1 - Primary Actions
         row1 = ctk.CTkFrame(btn_frame, fg_color="transparent")
-        row1.pack(fill="x", pady=(0, 5))
+        row1.pack(fill="x", pady=(0, 8))
         
         self.cancel_btn = ctk.CTkButton(row1, text="❌ Cancel", height=45, fg_color="#c0392b", 
-            hover_color="#e74c3c", command=self.on_cancel)
+            hover_color="#e74c3c", font=ctk.CTkFont(size=13, weight="bold"), command=self.on_cancel)
         self.cancel_btn.pack(side="left", fill="x", expand=True, padx=(0, 5))
         
-        self.back_btn = ctk.CTkButton(row1, text="← Back", height=45, state="disabled", command=self.on_back)
+        self.back_btn = ctk.CTkButton(row1, text="← Back", height=45, state="disabled", 
+            fg_color=("gray70", "gray25"), hover_color=("gray60", "gray30"), command=self.on_back)
         self.back_btn.pack(side="left", fill="x", expand=True, padx=(5, 0))
         
+        # Row 2 - Results Actions
         row2 = ctk.CTkFrame(btn_frame, fg_color="transparent")
         row2.pack(fill="x")
         
-        self.open_btn = ctk.CTkButton(row2, text="📂 Open Output", height=45, state="disabled", command=self.on_open_output)
+        self.open_btn = ctk.CTkButton(row2, text="📂 Open Output Folder", height=45, state="disabled", 
+            fg_color=("gray70", "gray25"), hover_color=("gray60", "gray30"), command=self.on_open_output)
         self.open_btn.pack(side="left", fill="x", expand=True, padx=(0, 5))
         
-        self.results_btn = ctk.CTkButton(row2, text="📂 Browse Videos", height=45, state="disabled", 
-            fg_color="#27ae60", hover_color="#2ecc71", command=self.on_browse)
+        self.results_btn = ctk.CTkButton(row2, text="📋 Browse All Clips", height=45, state="disabled", 
+            fg_color="#27ae60", hover_color="#2ecc71", font=ctk.CTkFont(size=13, weight="bold"), command=self.on_browse)
         self.results_btn.pack(side="left", fill="x", expand=True, padx=(5, 0))
         
         # Footer

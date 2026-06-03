@@ -78,12 +78,13 @@ class YTShortClipperApp(ctk.CTk):
         # Session data for highlight selection flow
         self.session_data = None  # Will store result from find_highlights_only
         
-        self.title("YT Short Clipper")
-        self.geometry("780x620")
-        self.resizable(False, False)
+        self.title("YT Short Clipper — AI Powered")
+        self.geometry("1100x750")
+        self.minsize(900, 600)  # Set minimum size
+        self.resizable(True, True)  # Make resizable
         
         ctk.set_appearance_mode("dark")
-        ctk.set_default_color_theme("blue")
+        ctk.set_default_color_theme("blue")  # Still nice, but we can customize appearance later
         
         # Set app icon after window is created
         self.after(200, self.set_app_icon)
@@ -240,113 +241,100 @@ class YTShortClipperApp(ctk.CTk):
         left_col.pack(side="left", fill="y", padx=(0, 20))
         
         # YouTube URL
-        ctk.CTkLabel(left_col, text="YouTube URL", font=ctk.CTkFont(size=11, weight="bold"), 
-            anchor="w").pack(fill="x", pady=(0, 3))
+        ctk.CTkLabel(left_col, text="🎥 YouTube URL", font=ctk.CTkFont(size=12, weight="bold"),
+            anchor="w").pack(fill="x", pady=(0, 4))
         
         url_input_container = ctk.CTkFrame(left_col, fg_color="transparent")
-        url_input_container.pack(fill="x", pady=(0, 8))
+        url_input_container.pack(fill="x", pady=(0, 12))
         
         self.url_var = ctk.StringVar()
         self.url_var.trace_add("write", self.on_url_change)
         self.url_entry = ctk.CTkEntry(url_input_container, textvariable=self.url_var, 
-            placeholder_text="Paste YouTube link...", width=220, height=32, border_width=1,
-            border_color=("#3a3a3a", "#2a2a2a"), fg_color=("#1a1a1a", "#0a0a0a"))
-        self.url_entry.pack(side="left", padx=(0, 5))
+            placeholder_text="Paste YouTube link...", height=38, border_width=1,
+            border_color=("gray70", "gray30"), fg_color=("gray15", "gray20"), corner_radius=8)
+        self.url_entry.pack(side="left", padx=(0, 6), fill="x", expand=True)
         
-        self.paste_btn = ctk.CTkButton(url_input_container, text="📋 Paste", width=65, height=32,
-            fg_color=("#3a3a3a", "#2a2a2a"), hover_color=("#4a4a4a", "#3a3a3a"),
-            font=ctk.CTkFont(size=10), command=self.paste_url)
+        self.paste_btn = ctk.CTkButton(url_input_container, text="📋 Paste", width=70, height=38,
+            fg_color=("gray30", "gray25"), hover_color=("gray40", "gray35"),
+            font=ctk.CTkFont(size=11), corner_radius=8, command=self.paste_url)
         self.paste_btn.pack(side="left")
         
         # Subtitle Language
-        ctk.CTkLabel(left_col, text="Subtitle Language", font=ctk.CTkFont(size=11, weight="bold"), 
-            anchor="w").pack(fill="x", pady=(3, 3))
+        ctk.CTkLabel(left_col, text="🌐 Subtitle Language", font=ctk.CTkFont(size=12, weight="bold"),
+            anchor="w").pack(fill="x", pady=(4, 4))
         
         self.subtitle_frame = ctk.CTkFrame(left_col, fg_color="transparent")
-        self.subtitle_frame.pack(fill="x", pady=(0, 8))
+        self.subtitle_frame.pack(fill="x", pady=(0, 12))
         self.subtitle_loaded = False
         
         self.subtitle_var = ctk.StringVar(value="id - Indonesian")
         self.subtitle_dropdown = ctk.CTkOptionMenu(self.subtitle_frame, 
-            variable=self.subtitle_var, values=["id - Indonesian"], width=290,
-            height=32, fg_color=("#2b2b2b", "#1a1a1a"),
-            button_color=("#3a3a3a", "#2a2a2a"), button_hover_color=("#4a4a4a", "#3a3a3a"),
+            variable=self.subtitle_var, values=["id - Indonesian"], height=38,
+            fg_color=("gray15", "gray20"), button_color=("gray30", "gray25"), 
+            button_hover_color=("gray40", "gray35"), corner_radius=8,
             state="disabled")
-        self.subtitle_dropdown.pack(anchor="w")
+        self.subtitle_dropdown.pack(anchor="w", fill="x")
         
         self.subtitle_loading = ctk.CTkLabel(self.subtitle_frame, text="⏳ Loading...", 
             font=ctk.CTkFont(size=10), text_color="gray")
         
         # Clip Count
-        ctk.CTkLabel(left_col, text="Clip Count", font=ctk.CTkFont(size=11, weight="bold"), 
-            anchor="w").pack(fill="x", pady=(3, 3))
+        ctk.CTkLabel(left_col, text="✂️ Clip Count", font=ctk.CTkFont(size=12, weight="bold"),
+            anchor="w").pack(fill="x", pady=(4, 4))
         
         clips_input_frame = ctk.CTkFrame(left_col, fg_color="transparent")
-        clips_input_frame.pack(fill="x", pady=(0, 5))
+        clips_input_frame.pack(fill="x", pady=(0, 6))
         
         self.clips_var = ctk.StringVar(value="5")
-        clips_entry = ctk.CTkEntry(clips_input_frame, textvariable=self.clips_var, width=60, height=32,
-            fg_color=("#2b2b2b", "#1a1a1a"), border_width=1, border_color=("#3a3a3a", "#2a2a2a"), justify="center")
+        clips_entry = ctk.CTkEntry(clips_input_frame, textvariable=self.clips_var, width=80, height=38,
+            fg_color=("gray15", "gray20"), border_width=1, border_color=("gray70", "gray30"),
+            justify="center", corner_radius=8)
         clips_entry.pack(side="left", padx=(0, 8))
         
-        ctk.CTkLabel(clips_input_frame, text="(1-10)", font=ctk.CTkFont(size=10), 
+        ctk.CTkLabel(clips_input_frame, text="(1-10 clips)", font=ctk.CTkFont(size=10), 
             text_color="gray").pack(side="left")
         
         # Right column - Thumbnail 16:9
         right_col = ctk.CTkFrame(top_row, fg_color="transparent")
-        right_col.pack(side="right", fill="y")
+        right_col.pack(side="right", fill="both", expand=True, padx=(0, 0))
         
-        # Video preview frame 16:9 (400x225)
-        self.thumb_frame = ctk.CTkFrame(right_col, width=400, height=225, 
-            fg_color=("#2b2b2b", "#1a1a1a"), corner_radius=8)
-        self.thumb_frame.pack(anchor="ne")
+        # Video preview frame 16:9 (500x281)
+        self.thumb_frame = ctk.CTkFrame(right_col, width=500, height=281, 
+            fg_color=("gray25", "gray17"), corner_radius=12, border_width=1,
+            border_color=("gray40", "gray25"))
+        self.thumb_frame.pack(anchor="ne", fill="both", expand=True)
         self.thumb_frame.pack_propagate(False)
         
         self.create_preview_placeholder()
         
         # ===== MIDDLE ROW: Cookies only (full width) =====
-        middle_row = ctk.CTkFrame(page, fg_color="transparent")
-        middle_row.pack(fill="x", padx=20, pady=(0, 10))
+        bottom_row_content = ctk.CTkFrame(page, fg_color="transparent")
+        bottom_row_content.pack(fill="x", padx=20, pady=(15, 0))
+
+        # Cookies status on left
+        cookies_info_frame = ctk.CTkFrame(bottom_row_content, fg_color="transparent")
+        cookies_info_frame.pack(side="left", fill="x", expand=True)
         
-        # YouTube Cookies card (full width)
-        cookies_frame = ctk.CTkFrame(middle_row, fg_color=("#2b2b2b", "#1a1a1a"), corner_radius=8)
-        cookies_frame.pack(fill="x")
+        self.cookies_label = ctk.CTkLabel(cookies_info_frame, 
+            text="🍪 YouTube cookies: Not Loaded", 
+            font=ctk.CTkFont(size=14, weight="bold"), anchor="w")
+        self.cookies_label.pack(side="top", anchor="w")
         
-        ctk.CTkLabel(cookies_frame, text="YouTube Cookies", font=ctk.CTkFont(size=11, weight="bold"), 
-            anchor="w").pack(fill="x", padx=12, pady=(10, 5))
+        ctk.CTkLabel(cookies_info_frame, 
+            text="Required for downloading age-restricted videos and fetching subtitles. Click to upload.", 
+            font=ctk.CTkFont(size=11), text_color="gray", anchor="w").pack(side="top", anchor="w", pady=(2, 0))
+
+        # Start Button on right
+        self.start_button = ctk.CTkButton(bottom_row_content, text="🚀 Start Clipping", 
+            command=self.start_processing, height=50, width=200,
+            font=ctk.CTkFont(size=18, weight="bold"), corner_radius=12,
+            fg_color="#FF4500", hover_color="#E03E00",
+            state="disabled")
+        self.start_button.pack(side="right")
         
-        self.cookies_status_label = ctk.CTkLabel(cookies_frame, text="🍪 No cookies", 
-            font=ctk.CTkFont(size=10), anchor="w", text_color="gray")
-        self.cookies_status_label.pack(fill="x", padx=12, pady=(0, 5))
-        
-        upload_cookies_btn = ctk.CTkButton(cookies_frame, text="📁 Upload", height=28,
-            fg_color=("#3a3a3a", "#2a2a2a"), hover_color=("#4a4a4a", "#3a3a3a"),
-            font=ctk.CTkFont(size=10), command=self.upload_cookies)
-        upload_cookies_btn.pack(fill="x", padx=12, pady=(0, 10))
-        
-        # ===== BOTTOM: Generate button + Browse =====
-        bottom_section = ctk.CTkFrame(page, fg_color="transparent")
-        bottom_section.pack(fill="x", padx=20, pady=(0, 5))
-        
-        self.start_btn = ctk.CTkButton(bottom_section, text="Find Highlights", image=self.play_icon, 
-            compound="left", font=ctk.CTkFont(size=13, weight="bold"),
-            height=40, command=self.start_processing, state="disabled", 
-            fg_color="gray", hover_color="gray", corner_radius=8)
-        self.start_btn.pack(fill="x", pady=(0, 5))
-        
-        sessions_link = ctk.CTkLabel(bottom_section, text="📋 Browse Sessions", 
-            font=ctk.CTkFont(size=10), text_color=("#3B8ED0", "#1F6AA5"), cursor="hand2")
-        sessions_link.pack()
-        sessions_link.bind("<Button-1>", lambda e: self.show_page("session_browser"))
-        
-        # ===== LIB STATUS =====
-        self.lib_status_frame = ctk.CTkFrame(page, fg_color="transparent")
-        self.lib_status_frame.pack(fill="x", padx=20, pady=(5, 0))
-        
-        self.lib_status_label = ctk.CTkLabel(self.lib_status_frame, text="", 
-            font=ctk.CTkFont(size=10), cursor="hand2")
-        self.lib_status_label.pack()
-        self.lib_status_label.bind("<Button-1>", lambda e: self.show_page("lib_status"))
+        # Keep old reference for backward compatibility
+        self.cookies_status_frame = cookies_info_frame
+
         
         # Check and update lib status
         self.check_lib_status()
@@ -494,19 +482,17 @@ class YTShortClipperApp(ctk.CTk):
     def check_cookies_status(self):
         """Check if cookies.txt exists and update UI"""
         if self.cookies_path.exists():
-            self.cookies_status_label.configure(
-                text="✅ cookies.txt loaded",
-                text_color=("#27ae60", "#2ecc71")  # Green
+            self.cookies_label.configure(
+                text="✅ YouTube cookies: Loaded",
+                text_color=("#27ae60", "#2ecc71")
             )
-            # Update start button state when cookies status changes
             self.update_start_button_state()
             return True
         else:
-            self.cookies_status_label.configure(
-                text="🍪 No cookies.txt found",
+            self.cookies_label.configure(
+                text="🍪 YouTube cookies: Not Loaded",
                 text_color="gray"
             )
-            # Update start button state when cookies status changes
             self.update_start_button_state()
             return False
     
@@ -729,7 +715,7 @@ class YTShortClipperApp(ctk.CTk):
         # If no cookies, disable URL entry and start button
         if not has_cookies:
             self.url_entry.configure(state="disabled")
-            self.start_btn.configure(state="disabled", fg_color="gray", hover_color="gray")
+            self.start_button.configure(state="disabled", fg_color="gray", hover_color="gray")
             return
         
         # Cookies exist - enable URL input
@@ -740,10 +726,9 @@ class YTShortClipperApp(ctk.CTk):
         video_id = extract_video_id(url)
         
         if video_id and self.subtitle_loaded and libs_ok:
-            self.start_btn.configure(state="normal", fg_color=("#1f538d", "#14375e"), 
-                                    hover_color=("#144870", "#0d2a47"))
+            self.start_button.configure(state="normal", fg_color="#FF4500", hover_color="#E03E00")
         else:
-            self.start_btn.configure(state="disabled", fg_color="gray", hover_color="gray")
+            self.start_button.configure(state="disabled", fg_color="gray", hover_color="gray")
     
     def check_lib_status(self):
         """Check library installation status and update UI"""
@@ -987,7 +972,7 @@ class YTShortClipperApp(ctk.CTk):
             font=ctk.CTkFont(size=13), text_color="gray")
         self.thumb_label.pack()
         
-        self.start_btn.configure(state="disabled", fg_color="gray", hover_color="gray")
+        self.start_button.configure(state="disabled", fg_color="gray", hover_color="gray")
         threading.Thread(target=fetch, daemon=True).start()
     
     def on_thumbnail_error(self):
@@ -1005,7 +990,7 @@ class YTShortClipperApp(ctk.CTk):
             font=ctk.CTkFont(size=13), text_color="gray", justify="center")
         self.thumb_label.pack()
         
-        self.start_btn.configure(state="disabled", fg_color="gray", hover_color="gray")
+        self.start_button.configure(state="disabled", fg_color="gray", hover_color="gray")
     
     def show_thumbnail(self, img):
         try:
@@ -1030,7 +1015,7 @@ class YTShortClipperApp(ctk.CTk):
 
     def start_processing(self):
         # Disable button during validation
-        self.start_btn.configure(state="disabled", text="Validating...")
+        self.start_button.configure(state="disabled", text="Validating...")
         
         def validate_and_start():
             try:
@@ -1090,12 +1075,12 @@ class YTShortClipperApp(ctk.CTk):
     
     def _on_validation_failed(self, error_msg):
         """Handle validation failure"""
-        self.start_btn.configure(state="normal", text="Find Highlights")
+        self.start_button.configure(state="normal", text="Find Highlights")
         messagebox.showerror("Validation Failed", error_msg)
     
     def _start_processing_validated(self):
         """Start processing after validation passed"""
-        self.start_btn.configure(state="normal", text="Find Highlights")
+        self.start_button.configure(state="normal", text="Find Highlights")
         
         # Legacy validation (backward compatibility)
         if not self.client:
