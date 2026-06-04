@@ -23,31 +23,15 @@ let iconTriedData = false;
 const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none"><rect width="96" height="96" rx="18" fill="#0B1B24"/><path d="M18 36h60v36a6 6 0 0 1-6 6H24a6 6 0 0 1-6-6V36Z" fill="#12BFE4"/><path d="M20 20l10 10m6-10 10 10m6-10 10 10m6-10 10 10" stroke="#12BFE4" stroke-width="6" stroke-linecap="round"/></svg>`;
 let providerType = 'ytclip';
 
-function waitForApi() {
-  return new Promise((resolve) => {
-    if (window.pywebview && window.pywebview.api) {
-      resolve();
-      return;
-    }
-    let tries = 0;
-    const timer = setInterval(() => {
-      tries += 1;
-      if (window.pywebview && window.pywebview.api) {
-        clearInterval(timer);
-        resolve();
-      } else if (tries > 50) {
-        clearInterval(timer);
-        resolve();
-      }
-    }, 100);
-  });
-}
-
-function toFileUrl(path) {
-  if (!path) return '';
-  if (path.startsWith('file://')) return path;
-  const fixed = path.replace(/\\/g, '/');
-  return 'file:///' + fixed;
+// Helper function to make API calls
+async function apiCall(endpoint, options = {}) {
+  const defaultOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const response = await fetch(endpoint, { ...defaultOptions, ...options });
+  return response.json();
 }
 
 function lockControls(state) {
@@ -119,7 +103,7 @@ async function setIconFromApi() {
   if (iconTriedData) return;
   iconTriedData = true;
   try {
-    const icon = await window.pywebview.api.get_icon_data();
+    const icon = await apiCall('/api/icon');
     if (icon && icon.data) {
       header.icon.src = icon.data;
     }
@@ -140,13 +124,16 @@ async function start() {
   homeView.fields.status.textContent = 'Starting';
   homeView.fields.bar.style.width = '0%';
   try {
-    const res = await window.pywebview.api.start_processing(
-      url,
-      parseInt(homeView.fields.clips.value, 10),
-      homeView.fields.captions.checked,
-      homeView.fields.hook.checked,
-      homeView.fields.subtitle.value
-    );
+    const res = await apiCall('/api/start', {
+      method: 'POST',
+      body: JSON.stringify({
+        url: url,
+        num_clips: parseInt(homeView.fields.clips.value, 10),
+        add_captions: homeView.fields.captions.checked,
+        add_hook: homeView.fields.hook.checked,
+        subtitle_lang: homeView.fields.subtitle.value
+      })
+    });
     if (res && res.status === 'started') {
       poll();
       polling = setInterval(poll, 500);
@@ -162,7 +149,7 @@ async function start() {
 
 async function poll() {
   try {
-    const p = await window.pywebview.api.get_progress();
+    const p = await apiCall('/api/progress');
     const pr = Math.max(0, Math.min(1, p.progress || 0));
     homeView.fields.bar.style.width = (pr * 100).toFixed(1) + '%';
     homeView.fields.status.textContent = p.status || '';
@@ -205,7 +192,10 @@ aiView.fields.saveBtn.addEventListener('click', async () => {
   };
   aiView.fields.status.textContent = 'Saving';
   try {
-    const res = await window.pywebview.api.save_ai_settings(payload);
+    const res = await apiCall('/api/ai-settings', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
     aiView.fields.status.textContent = res && res.status === 'saved' ? 'Saved' : 'Error';
   } catch {
     aiView.fields.status.textContent = 'Error';
@@ -213,19 +203,11 @@ aiView.fields.saveBtn.addEventListener('click', async () => {
 });
 
 async function init() {
-  await waitForApi();
   setIconFallback();
   await setIconFromApi();
-  if (!header.icon.src) {
-    try {
-      const paths = await window.pywebview.api.get_asset_paths();
-      if (paths && paths.icon) {
-        header.icon.src = toFileUrl(paths.icon);
-      }
-    } catch {}
-  }
+  
   try {
-    const ai = await window.pywebview.api.get_ai_settings();
+    const ai = await apiCall('/api/ai-settings');
     const hf = ai.highlight_finder || {};
     const cm = ai.caption_maker || {};
     const hm = ai.hook_maker || {};
@@ -239,10 +221,12 @@ async function init() {
     aiView.fields.hmKey.value = hm.api_key || '';
     setSelectOptions(aiView.fields.hmModel, [hm.model].filter(Boolean), hm.model || '');
   } catch {}
+  
   try {
-    const provider = await window.pywebview.api.get_provider_type();
+    const provider = await apiCall('/api/provider-type');
     providerType = provider.provider_type || 'ytclip';
   } catch {}
+  
   setProviderType(providerType, true);
   setActiveView('home');
 }
@@ -259,16 +243,26 @@ async function validateAndLoad(kind) {
   const baseUrl = kind.url.value.trim();
   const apiKey = kind.key.value.trim();
   kind.status.textContent = 'Validating';
-  const res = await window.pywebview.api.validate_api_key(baseUrl, apiKey);
-  if (!res || res.status !== 'ok') {
-    kind.status.textContent = res && res.message ? res.message : 'Invalid';
-    return;
+  try {
+    const res = await apiCall('/api/validate-key', {
+      method: 'POST',
+      body: JSON.stringify({ base_url: baseUrl, api_key: apiKey })
+    });
+    if (!res || res.status !== 'ok') {
+      kind.status.textContent = res && res.message ? res.message : 'Invalid';
+      return;
+    }
+    kind.status.textContent = 'Loading models';
+    const modelsRes = await apiCall('/api/models', {
+      method: 'POST',
+      body: JSON.stringify({ base_url: baseUrl, api_key: apiKey })
+    });
+    const models = (modelsRes && modelsRes.models) || [];
+    setSelectOptions(kind.model, models, kind.model.value);
+    kind.status.textContent = models.length ? 'Valid' : 'Valid, no models';
+  } catch (e) {
+    kind.status.textContent = 'Error: ' + e.message;
   }
-  kind.status.textContent = 'Loading models';
-  const modelsRes = await window.pywebview.api.get_models(baseUrl, apiKey);
-  const models = (modelsRes && modelsRes.models) || [];
-  setSelectOptions(kind.model, models, kind.model.value);
-  kind.status.textContent = models.length ? 'Valid' : 'Valid, no models';
 }
 
 aiView.fields.hfValidateBtn.addEventListener('click', () => validateAndLoad({
@@ -292,5 +286,11 @@ aiView.fields.hmValidateBtn.addEventListener('click', () => validateAndLoad({
   status: aiView.fields.hmValidateStatus
 }));
 
-window.addEventListener('pywebviewready', init);
-setTimeout(() => init(), 800);
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', init);
+// Also run init immediately in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
