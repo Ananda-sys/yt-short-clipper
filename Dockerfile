@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Install Python requirements (web version includes flask)
-COPY requirements.txt requirements_web.txt .
+COPY requirements.txt requirements_web.txt ./
 RUN pip install --no-cache-dir -r requirements_web.txt
 
 # Copy source code
