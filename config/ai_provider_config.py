@@ -119,7 +119,7 @@ SPECIALIZED_MODELS = {
     "caption_maker": {
         "ytclip": ["whisper-1"],
         "openai": ["whisper-1"],  # Special case for whisper
-        "google": [],  # Gemini doesn't have whisper equivalent
+        "google": ["gemini-flash-latest"],  # Gemini native audio transcription (free tier)
         "groq": [],
     },
     "hook_maker": {

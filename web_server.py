@@ -78,8 +78,11 @@ class WebAPI:
             items = data.get("data", [])
             models = []
             for item in items:
-                mid = item.get("id")
+                mid = item.get("id", "")
                 if mid:
+                    # Strip 'models/' prefix from OpenAI-compat Gemini endpoint
+                    if mid.startswith("models/"):
+                        mid = mid[len("models/"):]
                     models.append(mid)
             return {"models": models}
         except:
