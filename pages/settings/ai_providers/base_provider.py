@@ -42,7 +42,7 @@ class BaseProviderSettingsPage(BaseSettingsSubPage):
         
         self.provider_type_var = ctk.StringVar(value="ytclip")
         self.provider_dropdown = ctk.CTkOptionMenu(type_frame, 
-            values=["🎬 YT CLIP AI", "🤖 OPEN AI", "⚙️ CUSTOM"],
+            values=["🎬 YT CLIP AI", "🤖 OPEN AI", "🔵 GOOGLE GEMINI", "⚙️ CUSTOM"],
             variable=self.provider_type_var, height=36,
             command=self._on_provider_type_changed)
         self.provider_dropdown.pack(fill="x", pady=(5, 0))
@@ -140,6 +140,8 @@ class BaseProviderSettingsPage(BaseSettingsSubPage):
             return "ytclip"
         elif "OPEN AI" in value:
             return "openai"
+        elif "GEMINI" in value:
+            return "google"
         else:
             return "custom"
     
@@ -150,6 +152,8 @@ class BaseProviderSettingsPage(BaseSettingsSubPage):
             return "https://ai-api.ytclip.org/v1"
         elif ptype == "openai":
             return "https://api.openai.com/v1"
+        elif ptype == "google":
+            return "https://generativelanguage.googleapis.com/v1beta/openai"
         else:
             return self.url_entry.get().strip() or "https://api.openai.com/v1"
     
@@ -242,6 +246,8 @@ class BaseProviderSettingsPage(BaseSettingsSubPage):
             self.provider_type_var.set("🎬 YT CLIP AI")
         elif "openai.com" in base_url:
             self.provider_type_var.set("🤖 OPEN AI")
+        elif "generativelanguage" in base_url:
+            self.provider_type_var.set("🔵 GOOGLE GEMINI")
         else:
             self.provider_type_var.set("⚙️ CUSTOM")
             self.url_section.pack(fill="x", pady=(0, 10), after=self.content.winfo_children()[1])

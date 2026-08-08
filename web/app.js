@@ -62,10 +62,17 @@ function setProviderType(type, applyBaseUrl) {
   aiView.fields.cmUrlField.classList.toggle('hidden', !showCustom);
   aiView.fields.hmUrlField.classList.toggle('hidden', !showCustom);
   if (applyBaseUrl && !showCustom) {
-    const baseUrl = type === 'ytclip' ? 'https://ai-api.ytclip.org/v1' : 'https://api.openai.com/v1';
+    const baseUrl = type === 'ytclip'
+      ? 'https://ai-api.ytclip.org/v1'
+      : type === 'google'
+        ? 'https://generativelanguage.googleapis.com/v1beta/openai'
+        : 'https://api.openai.com/v1';
     aiView.fields.hfUrl.value = baseUrl;
     aiView.fields.cmUrl.value = baseUrl;
     aiView.fields.hmUrl.value = baseUrl;
+  }
+  if (applyBaseUrl && type === 'google') {
+    setSelectOptions(aiView.fields.hfModel, ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'], 'gemini-2.5-flash');
   }
 }
 

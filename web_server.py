@@ -178,6 +178,9 @@ class WebAPI:
 
     def _get_models_url(self, base_url):
         url = base_url.rstrip("/")
+        # Gemini's OpenAI-compatible endpoint already includes /openai
+        if "generativelanguage.googleapis.com" in url:
+            return f"{url}/models"
         if url.endswith("/v1"):
             return f"{url}/models"
         return f"{url}/v1/models"

@@ -26,10 +26,12 @@ window.Components.AiSettingsView = function () {
 
   const providerYt = makeProvider('🎬 YT CLIP AI', 'ytclip');
   const providerOpenai = makeProvider('🤖 OPENAI', 'openai');
+  const providerGemini = makeProvider('🔵 GEMINI', 'google');
   const providerCustom = makeProvider('⚙️ CUSTOM', 'custom');
 
   providerGrid.appendChild(providerYt);
   providerGrid.appendChild(providerOpenai);
+  providerGrid.appendChild(providerGemini);
   providerGrid.appendChild(providerCustom);
 
   const grid = document.createElement('div');
@@ -125,7 +127,7 @@ window.Components.AiSettingsView = function () {
   return {
     element: section,
     fields: {
-      providerButtons: [providerYt, providerOpenai, providerCustom],
+      providerButtons: [providerYt, providerOpenai, providerGemini, providerCustom],
       hfUrl: hf.url,
       hfUrlField: hf.urlField,
       hfKey: hf.key,
